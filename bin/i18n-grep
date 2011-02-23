@@ -1,0 +1,22 @@
+#!/usr/bin/env ruby
+$:.unshift File.dirname(__FILE__) + "/../lib"
+require 'i18n-grep'
+require 'optparse'
+
+verbose = false
+dirs = []
+opt = OptionParser.new
+opt.banner += " [file...]"
+opt.on('-v') { verbose = true}
+opt.on('-d=DIRECTORY', 'directory') { |dir| dirs << dir }
+opt.parse!(ARGV)
+
+files = ARGV[1..-1] + dirs.map { |dir| Dir[File.join(dir, '**', '*.yml')] }.flatten
+
+I18n.grep(ARGV[0], files).each do |path, line, key, word|
+  if verbose
+    puts "#{path}:#{line} - #{key}: #{word}"
+  else
+    puts "#{path}:#{line}"
+  end
+end
